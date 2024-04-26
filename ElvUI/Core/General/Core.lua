@@ -26,14 +26,11 @@ local UIParent = UIParent
 local UnitFactionGroup = UnitFactionGroup
 local UnitGUID = UnitGUID
 
-local GetSpecialization = (E.Classic or E.Cata) and LCS.GetSpecialization or GetSpecialization
+local GetSpecialization = (E.Classic or E.Wrath) and LCS.GetSpecialization or GetSpecialization
 
 local DisableAddOn = (C_AddOns and C_AddOns.DisableAddOn) or DisableAddOn
 local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 local GetCVarBool = C_CVar.GetCVarBool
-
-local C_AddOns_GetAddOnEnableState = C_AddOns and C_AddOns.GetAddOnEnableState
-local GetAddOnEnableState = GetAddOnEnableState -- eventually this will be on C_AddOns and args swap
 
 local LE_PARTY_CATEGORY_HOME = LE_PARTY_CATEGORY_HOME
 local LE_PARTY_CATEGORY_INSTANCE = LE_PARTY_CATEGORY_INSTANCE
@@ -62,7 +59,7 @@ local LSM = E.Libs.LSM
 E.noop = function() end
 E.title = format('%s%s|r', E.InfoColor, 'ElvUI')
 E.toc = tonumber(GetAddOnMetadata('ElvUI', 'X-Interface'))
-E.version, E.versionString = E:ParseVersionString('ElvUI')
+E.version, E.versionString, E.versionDev, E.versionGit = E:ParseVersionString('ElvUI')
 E.myfaction, E.myLocalizedFaction = UnitFactionGroup('player')
 E.myLocalizedClass, E.myclass, E.myClassID = UnitClass('player')
 E.myLocalizedRace, E.myrace, E.myRaceID = UnitRace('player')
@@ -525,14 +522,6 @@ do
 	end
 end
 
-function E:IsAddOnEnabled(addon)
-	if C_AddOns_GetAddOnEnableState then
-		return C_AddOns_GetAddOnEnableState(addon, E.myname) == 2
-	else
-		return GetAddOnEnableState(E.myname, addon) == 2
-	end
-end
-
 function E:IsIncompatible(module, addons)
 	for _, addon in ipairs(addons) do
 		local incompatible
@@ -900,14 +889,12 @@ end
 do
 	local SendMessageWaiting -- only allow 1 delay at a time regardless of eventing
 	function E:SendMessage()
-		if E.version < 99999 then
-			if IsInRaid() then
-				C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, (not IsInRaid(LE_PARTY_CATEGORY_HOME) and IsInRaid(LE_PARTY_CATEGORY_INSTANCE)) and 'INSTANCE_CHAT' or 'RAID')
-			elseif IsInGroup() then
-				C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, (not IsInGroup(LE_PARTY_CATEGORY_HOME) and IsInGroup(LE_PARTY_CATEGORY_INSTANCE)) and 'INSTANCE_CHAT' or 'PARTY')
-			elseif IsInGuild() then
-				C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, 'GUILD')
-			end
+		if IsInRaid() then
+			C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, (not IsInRaid(LE_PARTY_CATEGORY_HOME) and IsInRaid(LE_PARTY_CATEGORY_INSTANCE)) and 'INSTANCE_CHAT' or 'RAID')
+		elseif IsInGroup() then
+			C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, (not IsInGroup(LE_PARTY_CATEGORY_HOME) and IsInGroup(LE_PARTY_CATEGORY_INSTANCE)) and 'INSTANCE_CHAT' or 'PARTY')
+		elseif IsInGuild() then
+			C_ChatInfo_SendAddonMessage('ELVUI_VERSIONCHK', E.version, 'GUILD')
 		end
 
 		SendMessageWaiting = nil
@@ -957,10 +944,10 @@ do
 	_G.C_ChatInfo.RegisterAddonMessagePrefix('ELVUI_VERSIONCHK')
 
 	local f = CreateFrame('Frame')
+	f:SetScript('OnEvent', SendRecieve)
 	f:RegisterEvent('CHAT_MSG_ADDON')
 	f:RegisterEvent('GROUP_ROSTER_UPDATE')
 	f:RegisterEvent('PLAYER_ENTERING_WORLD')
-	f:SetScript('OnEvent', SendRecieve)
 end
 
 function E:UpdateStart(skipCallback, skipUpdateDB)
@@ -1486,7 +1473,7 @@ function E:UpdateActionBars(skipCallback)
 		ActionBars:UpdateExtraButtons()
 	end
 
-	if E.Cata and E.myclass == 'SHAMAN' then
+	if E.Wrath and E.myclass == 'SHAMAN' then
 		ActionBars:UpdateTotemBindings()
 	end
 
@@ -1566,7 +1553,7 @@ function E:UpdateMisc(skipCallback)
 
 	if E.Retail then
 		TotemTracker:PositionAndSize()
-	elseif E.Cata then
+	elseif E.Wrath then
 		ActionBars:PositionAndSizeTotemBar()
 	end
 
@@ -1995,7 +1982,7 @@ function E:Initialize()
 		E:Tutorials()
 	end
 
-	if E.Retail or E.Cata then
+	if E.Retail or E.Wrath or E.ClassicSOD then
 		E.Libs.DualSpec:EnhanceDatabase(E.data, 'ElvUI')
 	end
 

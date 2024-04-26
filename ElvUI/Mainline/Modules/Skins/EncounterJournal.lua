@@ -2,16 +2,13 @@ local E, L, V, P, G = unpack(ElvUI)
 local S = E:GetModule('Skins')
 
 local _G = _G
-local unpack = unpack
-local select = select
-local ipairs = ipairs
-local next = next
-local rad = rad
+local unpack, select = unpack, select
+local ipairs, next, rad = ipairs, next, rad
+local hooksecurefunc = hooksecurefunc
 
 local CreateFrame = CreateFrame
-local GetItemInfo = GetItemInfo
-local hooksecurefunc = hooksecurefunc
-local GetItemQualityColor = GetItemQualityColor
+local GetItemInfo = (C_Item and C_Item.GetItemInfo) or GetItemInfo
+local GetItemQualityColor = (C_Item and C_Item.GetItemQualityColor) or GetItemQualityColor
 
 local lootQuality = {
 	['loottab-set-itemborder-white'] = nil, -- dont show white
@@ -381,6 +378,7 @@ function S:Blizzard_EncounterJournal()
 
 	if E.private.skins.parchmentRemoverEnable then
 		EJ.MonthlyActivitiesFrame.Bg:SetAlpha(0)
+		EJ.MonthlyActivitiesFrame.ThemeContainer:SetAlpha(0)
 		_G.EncounterJournalInstanceSelectBG:SetAlpha(0)
 
 		local suggestFrame = EJ.suggestFrame

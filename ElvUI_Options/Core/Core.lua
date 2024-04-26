@@ -4,7 +4,6 @@ local MC = E:GetModule('ModuleCopy')
 local D = E:GetModule('Distributor')
 local S = E:GetModule('Skins')
 
-local GetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
 -- GLOBALS: ElvDB
 
 local ACH = E.Libs.ACH
@@ -312,7 +311,11 @@ E.Options.args.profiles.args.private.order = 2
 
 E.Libs.AceConfig:RegisterOptionsTable('ElvProfiles', E.Options.args.profiles.args.profile)
 
+<<<<<<< HEAD
 if E.Retail or E.Cata then
+=======
+if E.Retail or E.Wrath or E.ClassicSOD then
+>>>>>>> upstream/main
 	E.Libs.DualSpec:EnhanceOptions(E.Options.args.profiles.args.profile, E.data)
 end
 
